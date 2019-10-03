@@ -62,6 +62,7 @@ const verifyClaim = (claim, signature, publicKey) => {
 
 const submitClaim = (Account, Amount, Balance, Channel, PublicKey, Signature, Fee, Sequence, secret, callback, error) => {
     const object = transaction.paymentChannel_claim(Account, Amount, Balance, Channel, PublicKey, Signature, Fee, Sequence)
+    //console.log(object)
     const blob = transaction.signTX(object, secret).signedTransaction
     var tx = {
         "method": "submit",
@@ -94,7 +95,6 @@ const accountInfo = (account) => {
 const submit = (tx, callback, error) => {
     axios.post(SERVER, tx)
         .then(function (response) {
-            
             callback(response.data)
         })
         .catch(function (err) {

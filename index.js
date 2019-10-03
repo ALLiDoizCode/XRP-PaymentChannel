@@ -1,6 +1,16 @@
 const xrp = require("./XRP/xrp")
-
+const rippleKeyPairs = require("ripple-keypairs");
 var exports = module.exports = {};
+
+exports.createWallet = (secret) => {
+  var keypair = rippleKeyPairs.deriveKeypair(secret)
+  return{
+      secret:secret,
+      publicKey:keypair.publicKey,
+      privateKey:keypair.publicKey,
+      address:rippleKeyPairs.deriveAddress(keypair.publicKey)
+  }
+}
 
 exports.open = (owner, recipient, value, delay, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
@@ -47,34 +57,25 @@ exports.fund = (owner, channel, value, fee, callback, error) => {
   })
 }
 
-exports.claim = (owner, channel, value, signature, recipient, fee, callback, error) => {
+exports.makeClaim = (owner, channel, senderPublicKey, value, balance ,signature, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
   xrp.submit(tx, (obj) => {
+    console.log(obj)
     var seq = obj.result.account_data.Sequence;
-    const wallet = xrp.keypair(owner.secret)
-    const channelTX = accountChannel(owner.address, recipient)
-    xrp.submit(channelTX, (obj) => {
-      obj.result.channels.forEach((ch) => {
-        if (ch.channel_id == channel) {
-          xrp.submitClaim(owner.address, value, ch.balance, channel, wallet.publicKey, signature, fee, seq, owner.secret, (obj) => {
-            const engine_result = obj.result.engine_result
-            const engine_result_message = obj.result.engine_result_message
-            if (obj.result.engine_result == "tesSUCCESS") {
-              console.log("success")
-              callback(obj)
-            } else {
-              console.log("fail")
-              error(obj.result.engine_result)
-            }
-            console.log("Ledger message " + engine_result_message + " " + engine_result)
-          }, error)
-        }
-      });
-    }, (error) => {
-
-    })
+    xrp.submitClaim(owner.address, value, balance, channel.channel_id, senderPublicKey, signature, fee, seq, owner.secret, (obj) => {
+      const engine_result = obj.result.engine_result
+      const engine_result_message = obj.result.engine_result_message
+      if (obj.result.engine_result == "tesSUCCESS") {
+        //console.log("success")
+        callback(obj)
+      } else {
+        console.log("fail")
+        error(obj.result.engine_result)
+      }
+      console.log("Ledger message " + engine_result_message + " " + engine_result)
+    }, error)
   }, (error) => {
-
+    console.log(error)
   })
 }
 
@@ -117,6 +118,7 @@ exports.getXRPChannels = (address, recipient, callback, error) => {
   xrp.submit(channelTX, callback, error)
 }
 
+exports.claim = xrp.claim
 exports.keypair = xrp.keypair
 exports.verifyClaim = xrp.verifyClaim
 exports.getAddress = xrp.getAddress
