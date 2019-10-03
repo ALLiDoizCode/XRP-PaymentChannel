@@ -92,7 +92,6 @@ const accountInfo = (account) => {
 }
 
 const submit = (tx, callback, error) => {
-
     axios.post(SERVER, tx)
         .then(function (response) {
             

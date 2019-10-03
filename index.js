@@ -1,21 +1,18 @@
 const xrp = require("./XRP/xrp")
+
 var exports = module.exports = {};
 
 exports.open = (owner, recipient, value, delay, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
-  const publicKey = xrp.keypair(owner.secret).publicKey
   xrp.submit(tx, (obj) => {
     var seq = obj.result.account_data.Sequence;
     //SettleDelay
-    xrp.createChannel(owner.address, value, recipient, delay, publicKey, seq, fee, owner.secret, (obj) => {
-      console.log("seq")
+    xrp.createChannel(owner.address, value, recipient, delay, owner.publicKey, seq, fee, owner.secret, (obj) => {
       const engine_result = obj.result.engine_result
       const engine_result_message = obj.result.engine_result_message
       if (obj.result.engine_result == "tesSUCCESS") {
-        console.log("success")
         callback(obj)
       } else {
-        console.log("fail")
         error(obj.result.engine_result)
       }
       console.log("Ledger message " + engine_result_message + " " + engine_result)
@@ -122,4 +119,3 @@ exports.getXRPChannels = (address, recipient, callback, error) => {
 
 exports.keypair = xrp.keypair
 exports.getAddress = xrp.getAddress
-exports.connectContract = eth.connectContract
