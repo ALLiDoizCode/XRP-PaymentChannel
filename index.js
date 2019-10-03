@@ -118,4 +118,5 @@ exports.getXRPChannels = (address, recipient, callback, error) => {
 }
 
 exports.keypair = xrp.keypair
+exports.verifyClaim = xrp.verifyClaim
 exports.getAddress = xrp.getAddress
