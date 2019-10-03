@@ -1,7 +1,7 @@
 const xrp = require("./XRP/xrp")
 var exports = module.exports = {};
 
-exports.open = (owner, recipient, value, delay, callback, error, fee, ) => {
+exports.open = (owner, recipient, value, delay, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
   const publicKey = xrp.keypair(owner.secret).publicKey
   xrp.submit(tx, (obj) => {
@@ -27,7 +27,7 @@ exports.open = (owner, recipient, value, delay, callback, error, fee, ) => {
   })
 }
 
-exports.fund = (owner, channel, value, callback, error, fee) => {
+exports.fund = (owner, channel, value, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
   xrp.submit(tx, (obj) => {
     var seq = obj.result.account_data.Sequence;
@@ -50,7 +50,7 @@ exports.fund = (owner, channel, value, callback, error, fee) => {
   })
 }
 
-exports.claim = (owner, channel, value, signature, recipient, callback, error, fee) => {
+exports.claim = (owner, channel, value, signature, recipient, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
   xrp.submit(tx, (obj) => {
     var seq = obj.result.account_data.Sequence;
@@ -81,7 +81,7 @@ exports.claim = (owner, channel, value, signature, recipient, callback, error, f
   })
 }
 
-exports.closeChannel = (owner, channel, callback, error, fee) => {
+exports.closeChannel = (owner, channel, fee, callback, error) => {
   const tx = xrp.accountInfo(owner.address)
   xrp.submit(tx, (obj) => {
     var seq = obj.result.account_data.Sequence;
